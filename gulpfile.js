@@ -16,6 +16,33 @@ gulp.task('html', () => {
   .pipe($.livereload());
 });
 
+gulp.task('styles:dev', ['less:dev', 'fonts', 'images']);
+
+gulp.task('less:dev', () => {
+  return gulp.src('app/styles/**/*.less')
+  .pipe($.less({
+    paths: [
+      'node_modules/bootstrap/less'
+    ]
+  }))
+  .pipe(gulp.dest(path.join(distDir, 'styles')))
+  .pipe($.livereload());
+});
+
+gulp.task('fonts', () => {
+  return gulp.src([
+    'node_modules/bootstrap/fonts/*'
+  ])
+  .pipe(gulp.dest(path.join(distDir, 'fonts')));
+});
+
+gulp.task('images', () => {
+  return gulp.src([
+    'app/images/**/*'
+  ])
+  .pipe(gulp.dest(path.join(distDir, 'images')));
+});
+
 gulp.task('serve', () => {
   $.livereload.listen();
   connect()
@@ -24,8 +51,9 @@ gulp.task('serve', () => {
   .listen(3100);
 });
 
-gulp.task('dev', ['html', 'serve'], () => {
+gulp.task('dev', ['html', 'styles:dev', 'serve'], () => {
   gulp.watch('app/**/*.html', ['html']);
+  gulp.watch('app/styles/**/*.less', ['less:dev']);
 });
 
 gulp.task('default', ['clean'], () => {
