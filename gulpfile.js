@@ -7,9 +7,17 @@ var del = require('del');
 var connect = require('connect');
 var connectLivereload = require('connect-livereload');
 var serveStatic = require('serve-static');
-var webpackConfig = require('./webpack.config.js');
 var webpack = require('webpack');
-var bundler = webpack(webpackConfig);
+var bundler = webpack(require('./webpack.config.js'));
+
+function less() {
+  return gulp.src('app/styles/**/*.less')
+  .pipe($.less({
+    paths: [
+      'node_modules/bootstrap/less'
+    ]
+  }));
+}
 
 gulp.task('clean', del.bind(null, [distDir]));
 
@@ -21,16 +29,20 @@ gulp.task('html', () => {
 
 gulp.task('styles:dev', ['less:dev', 'fonts', 'images']);
 
+gulp.task('styles:prod', ['less:prod', 'fonts', 'images']);
+
 gulp.task('less:dev', () => {
-  return gulp.src('app/styles/**/*.less')
-  .pipe($.less({
-    paths: [
-      'node_modules/bootstrap/less'
-    ]
-  }))
+  return less()
   .pipe(gulp.dest(path.join(distDir, 'styles')))
   .pipe($.livereload());
 });
+
+gulp.task('less:prod', () => {
+  return less()
+  .pipe($.minifyCss())
+  .pipe(gulp.dest(path.join(distDir, 'styles')))
+});
+
 
 gulp.task('fonts', () => {
   return gulp.src([
@@ -60,6 +72,10 @@ gulp.task('bundle:dev', cb => {
   });
 });
 
+gulp.task('bundle:prod', cb => {
+  webpack(require('./webpack.production.config.js'), cb);
+});
+
 gulp.task('serve', () => {
   $.livereload.listen();
   connect()
@@ -72,6 +88,16 @@ gulp.task('dev', ['html', 'styles:dev', 'bundle:dev', 'serve'], () => {
   gulp.watch('app/**/*.html', ['html']);
   gulp.watch('app/styles/**/*.less', ['less:dev']);
   gulp.watch('app/scripts/**/*.js', ['bundle:dev']);
+});
+
+gulp.task('prod', ['html', 'styles:prod', 'bundle:prod'], () => {
+  return gulp.src(path.join(__dirname, distDir, '**/*'))
+  .pipe($.zip(pkg.name + '.zip'))
+  .pipe(gulp.dest('build'));
+});
+
+gulp.task('build', ['clean'], () => {
+  gulp.start('prod');
 });
 
 gulp.task('default', ['clean'], () => {
