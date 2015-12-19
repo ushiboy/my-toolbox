@@ -9,6 +9,7 @@ var connectLivereload = require('connect-livereload');
 var serveStatic = require('serve-static');
 var webpack = require('webpack');
 var bundler = webpack(require('./webpack.config.js'));
+var proxyMiddleware = require('http-proxy-middleware');
 
 function less() {
   return gulp.src('app/styles/**/*.less')
@@ -77,10 +78,18 @@ gulp.task('bundle:prod', cb => {
 });
 
 gulp.task('serve', () => {
+  var port = process.env.API_PORT || 3000;
+
   $.livereload.listen();
   connect()
   .use(connectLivereload())
   .use(serveStatic(path.join(__dirname, distDir)))
+  .use(proxyMiddleware([
+    '/api'
+  ], {
+    target: 'http://localhost:' + port,
+    changeOrigin: true
+  }))
   .listen(3100);
 });
 
