@@ -7,7 +7,8 @@
   "scripts": {
     "gulp": "gulp",
     "build": "gulp build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "mocha": "mocha",
+    "test": "mocha test/*-test.js"
   },
   "author": "",
   "license": "MIT",
@@ -18,6 +19,7 @@
     "connect": "^3.4.0",
     "connect-livereload": "^0.5.4",
     "del": "^2.2.0",
+    "espower-babel": "^4.0.0",
     "gulp": "^3.9.0",
     "gulp-less": "^3.0.5",
     "gulp-livereload": "^3.8.1",
@@ -25,6 +27,8 @@
     "gulp-minify-css": "^1.2.2",
     "gulp-util": "^3.0.7",
     "gulp-zip": "^3.0.2",
+    "mocha": "^2.3.4",
+    "power-assert": "^1.2.0",
     "serve-static": "^1.10.0",
     "webpack": "^1.12.9"
   },
