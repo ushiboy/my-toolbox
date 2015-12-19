@@ -7,6 +7,9 @@ var del = require('del');
 var connect = require('connect');
 var connectLivereload = require('connect-livereload');
 var serveStatic = require('serve-static');
+var webpackConfig = require('./webpack.config.js');
+var webpack = require('webpack');
+var bundler = webpack(webpackConfig);
 
 gulp.task('clean', del.bind(null, [distDir]));
 
@@ -43,6 +46,20 @@ gulp.task('images', () => {
   .pipe(gulp.dest(path.join(distDir, 'images')));
 });
 
+gulp.task('bundle:dev', cb => {
+  bundler.run((err, stats) => {
+    if (err) {
+      throw new $.util.PluginError('webpack:build', err);
+    }
+    $.util.log('[webpack:build]', stats.toString({
+      colors: true,
+      chunkModules: false
+    }));
+    cb();
+    $.livereload.reload();
+  });
+});
+
 gulp.task('serve', () => {
   $.livereload.listen();
   connect()
@@ -51,9 +68,10 @@ gulp.task('serve', () => {
   .listen(3100);
 });
 
-gulp.task('dev', ['html', 'styles:dev', 'serve'], () => {
+gulp.task('dev', ['html', 'styles:dev', 'bundle:dev', 'serve'], () => {
   gulp.watch('app/**/*.html', ['html']);
   gulp.watch('app/styles/**/*.less', ['less:dev']);
+  gulp.watch('app/scripts/**/*.js', ['bundle:dev']);
 });
 
 gulp.task('default', ['clean'], () => {
