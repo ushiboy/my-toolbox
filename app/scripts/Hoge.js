@@ -7,4 +7,12 @@ export default class Hoge {
   greet() {
     return `Hello! ${this._name}`;
   }
+
+  fetchGreet() {
+    return fetch('/api/greeting')
+    .then(res => res.json())
+    .then(json => {
+      return `${json.message} ${this._name}`;
+    });
+  }
 }
