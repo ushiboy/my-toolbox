@@ -1,0 +1,8 @@
+{
+  "framework": "mocha",
+  "before_tests": "webpack --config webpack.test.config.js",
+  "on_exit": "rm -rf .powered-assert/",
+  "src_files": [
+    ".powered-assert/**/*.js"
+  ]
+}
