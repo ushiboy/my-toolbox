@@ -10,6 +10,7 @@ var serveStatic = require('serve-static');
 var webpack = require('webpack');
 var bundler = webpack(require('./webpack.config.js'));
 var proxyMiddleware = require('http-proxy-middleware');
+var MockServe = require('json-schema-mockserve').MockServe;
 
 function less() {
   return gulp.src('app/styles/**/*.less')
@@ -79,6 +80,13 @@ gulp.task('bundle:prod', cb => {
 
 gulp.task('serve', () => {
   var port = process.env.API_PORT || 3000;
+
+  if (process.env.MOCK) {
+    new MockServe({
+      port: port,
+      path: path.join(__dirname, 'fixture', 'api.json')
+    }).start();
+  }
 
   $.livereload.listen();
   connect()

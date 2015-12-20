@@ -1,0 +1,46 @@
+{
+  "$schema": "http://interagent.github.io/interagent-hyper-schema",
+  "type": [
+    "object"
+  ],
+  "definitions": {
+    "greeting": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "title": "Greeting",
+      "description": "ご挨拶API",
+      "stability": "prototype",
+      "strictProperties": true,
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "message": {
+          "description": "ご挨拶メッセージ",
+          "example": "こんにちは",
+          "type": [
+            "string"
+          ]
+        }
+      },
+      "links": [
+        {
+          "description": "ご挨拶メッセージを取得する",
+          "href": "/api/greeting",
+          "method": "GET",
+          "rel": "self",
+          "title": "Info"
+        }
+      ],
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/greeting/definitions/message"
+        }
+      }
+    }
+  },
+  "properties": {
+    "greeting": {
+      "$ref": "#/definitions/greeting"
+    }
+  }
+}
