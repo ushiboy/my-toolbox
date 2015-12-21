@@ -1,6 +1,6 @@
-var pkg = require('./package.json');
-var distDir = pkg.dist;
 var path = require('path');
+var pkg = require('./package.json');
+var distDir = path.join(__dirname, pkg.dist);
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var del = require('del');
@@ -91,7 +91,7 @@ gulp.task('serve', () => {
   $.livereload.listen();
   connect()
   .use(connectLivereload())
-  .use(serveStatic(path.join(__dirname, distDir)))
+  .use(serveStatic(distDir))
   .use(proxyMiddleware([
     '/api'
   ], {
@@ -108,7 +108,7 @@ gulp.task('dev', ['html', 'styles:dev', 'bundle:dev', 'serve'], () => {
 });
 
 gulp.task('prod', ['html', 'styles:prod', 'bundle:prod'], () => {
-  return gulp.src(path.join(__dirname, distDir, '**/*'))
+  return gulp.src(path.join(distDir, '**/*'))
   .pipe($.zip(pkg.name + '.zip'))
   .pipe(gulp.dest('build'));
 });
