@@ -40,3 +40,8 @@ node_modules
 .node_repl_history
 
 
+### https://raw.github.com/github/gitignore/7adc93eed241301cd4e5e6860983dbba1d63e000/Global/Vagrant.gitignore
+
+.vagrant/
+
+
