@@ -780,6 +780,62 @@ package.json
 $ npm run gulp:mock
 ```
 
+### fetchをモックしてテスト
+
+Promiseベースのインターフェイスになっていることから、
+XMLHttpRequestよりも[fetch](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API)を使うようになった。
+fetchを使うAPIをテストする場合、[fetch-mock](https://github.com/wheresrhys/fetch-mock)を使っている。
+
+インストール
+```
+$ npm install --save-dev fetch-mock
+```
+
+テストコードは次のような感じに。
+fetchMockのmockでモック設定して、afterEachでrestoreしてモック解除している。
+
+test/Hoge-test.js
+```javascript
+import Hoge from '../app/scripts/Hoge';
+import assert from 'power-assert';
+import fetchMock from 'fetch-mock';
+
+describe('Hoge', () => {
+
+  const name = 'Test';
+  let hoge;
+  beforeEach(() => {
+    hoge = new Hoge(name);
+  });
+  afterEach(() => {
+    fetchMock.restore();
+  });
+
+  describe('#greet', () => {
+    it('returns greet message', () => {
+      assert(hoge.greet() === `Hello! ${name}`);
+    });
+  });
+
+  describe('#fetchGreet', () => {
+    beforeEach(() => {
+      fetchMock.mock('/api/greeting', 'GET', {
+        status: 200,
+        body: '{"message":"Hello Hello Hello..."}'
+      });
+    });
+    it('returns greet message promise', () => {
+      return hoge.fetchGreet()
+      .then(message => {
+        assert(message === `Hello Hello Hello... ${name}`);
+      });
+    });
+  });
+
+});
+```
+
+
 ### ブラウザでテスト
 
 Nodeの環境だけでなくブラウザ環境でもテストする場合は[testem](https://github.com/testem/testem)を使う。
