@@ -1,10 +1,10 @@
 # My Toolbox
 
-### 下準備
+フロントエンド開発に自分が使っているツールチェインまわり。
 
-プロジェクトのルートディレクトリで下準備。npm initでpackage.json作って、Node用の.gitignore設定を作る。
+### プロジェクトディレクトリの下準備
 
-.gitignore設定は[gibo](https://github.com/simonwhitaker/gibo)を使って作ってる。
+npm initでpackage.jsonを作り、[gibo](https://github.com/simonwhitaker/gibo)を使ってnode用の.gitignore設定を作っている。
 
 ```
 $ mkdir project
@@ -13,18 +13,20 @@ $ npm init
 $ gibo Node | tee .gitignore
 ```
 
-### ツールチェインのベースにするタスクランナー
+### タスクランナー
 
-タスクランナーは[gulp](http://gulpjs.com/)の3.9系を使ってる。
+タスクランナーは[gulp](http://gulpjs.com/)の3.9系を使っている。
+
 gulpコマンドはプロジェクト配下にインストールしたものをnpmのコマンド経由で使う。
+後々追加することになるgulpのプラグインはgulp-load-pluginsでまとめてロードできるようにしている。
 
-後々追加することになるgulpのプラグインはgulp-load-pluginsでまとめてロードできるようにしておく。
+HTMLやCSS、JavaScriptなどのファイルはappディレクトリ配下に置いて行き、
+各種ツールを通してビルド済みディレクトリ（dist）に配備されるようにする。
 
-HTMLやCSS、JavaScriptなどの編集するファイルはappディレクトリ配下に置いて行き、
-各種ツールを通してビルド済みのディレクトリ（dist）に配備されるようにする。
+ビルド済みディレクトリはpackage.jsonに設定として書いておき、gulpfile.jsなどから参照して使っている。
 
-ビルド済みディレクトリはpackage.jsonに設定として書いておき、gulpfile.jsで参照して使う。
 
+ディレクトリ構成は次のような感じ。
 ```
 .
 ├── app
@@ -40,7 +42,7 @@ HTMLやCSS、JavaScriptなどの編集するファイルはappディレクトリ
 $ npm install --save-dev gulp gulp-load-plugins del
 ```
 
-gulpの設定を作る。ベースで使うタスクは次の通り。
+開発時に使う共通的なgulpのタスクは次の通り。
 
 | タスク名 | 用途 |
 |:-|:-|
@@ -68,7 +70,7 @@ gulp.task('default', ['clean'], () => {
 });
 ```
 
-package.jsonにgulpコマンドとビルド済みディレクトリの設定を追加する。
+package.jsonにgulpコマンドとビルド済みディレクトリの設定を次のように追加している。
 
 package.json
 ```json
@@ -80,7 +82,7 @@ package.json
 -- 中略 --
 ```
 
-.gitignoreにビルド済みディレクトリを追加。
+ビルド済みディレクトリはgitignore対象。
 
 .gitignore
 ```
@@ -101,9 +103,6 @@ $ npm run gulp
 
 Webサーバはビルド済みディレクトリをドキュメントルートとして動作させる。
 gulpのwatchでファイル監視して、変更があったら必要なビルドをしてLiveReloadでブラウザを更新させる。
-
-[BrowserSync](https://www.browsersync.io/)をしばらく使っていたけど、
-connectで十分な機能しか使ってなかったのでconnectに戻した。
 
 インストール
 ```
@@ -126,8 +125,7 @@ app/index.html
 </html>
 ```
 
-gulpにhtmlとserveタスクを追加して、devタスクを修正する。
-
+HTMLと開発用Webサーバのためのgulpタスクは次の通り。
 
 | タスク名 | 用途 |
 |:-|:-|
@@ -162,13 +160,13 @@ gulp.task('dev', ['html', 'serve'], () => {
 -- 中略 --
 ```
 
-これでgulpを起動すると開発用Webサーバを立ち上げてブラウザで確認できるようになる。
+これでgulpを起動して、開発用Webサーバを立ち上げてブラウザで確認できる。
 
 ```
 $ npm run gulp
 ```
 
-### CSSや画像ファイルなどのstyleまわり
+### CSSや画像ファイルなどのスタイルまわり
 
 CSSは[Bootstrap](http://getbootstrap.com/)をベースに[less](http://less-ja.studiomohawk.com/)で書いて、
 [gulp-less](https://github.com/plus3network/gulp-less)でビルドしている。
@@ -179,15 +177,10 @@ $ npm install --save bootstrap
 $ npm install --save-dev gulp-less
 ```
 
-app/styles/app.lessとしてアプリ用のstyleとしている。
-importでbootstrapのlessを読ませて、あとは必要なstyleを書いていく。
-
-Reactみたいなコンポーネント作って行く系のを使ってると、
-コンポーネントごとにlessファイル作って管理とかしたほうがいいのかなーと思うけど、
-Bootstrapに毛の生えた程度にしかstyle追加してないのでapp.lessだけで今のところは済んでいる。
+アプリ用にapp.lessファイルを作り、importでbootstrapのlessを読ませて必要なスタイルを書いていく。
 
 app/styles/app.less
-```less
+```css
 @import '../../node_modules/bootstrap/less/bootstrap.less';
 
 body {
@@ -195,7 +188,7 @@ body {
 }
 ```
 
-htmlにcssの読み込みを追加。
+HTMLにCSSの読み込みを追加。
 
 app/index.html
 ```html
@@ -208,11 +201,11 @@ app/index.html
 -- 中略 --
 ```
 
-gulpにstyle周りのタスクを追加して、devタスクを修正する。
+スタイル周りのgulpタスクは次の通り。
 
 | タスク名 | 用途 |
 |:-|:-|
-| styles:dev | 開発環境用styleビルド（less:dev、fonts、imagesを実行する） |
+| styles:dev | 開発環境用スタイルビルド（less:dev、fonts、imagesを実行する） |
 | less:dev | lessファイルをビルドする |
 | fonts | フォントリソースをビルド済みディレクトリへ配備する |
 | images | 画像リソースをビルド済みディレクトリへ配備する |
@@ -255,15 +248,13 @@ gulp.task('dev', ['html', 'styles:dev', 'serve'], () => {
 -- 中略 --
 ```
 
-### JavaScriptまわり
+### JavaScriptまわり（モジュールバンドラ）
 
-[Babel](https://babeljs.io/)を使ってES6で書いたコードをES5にトランスパイルしてる。
+[Babel](https://babeljs.io/)を使ってES6で書いたコードをES5にトランスパイルしている。
 モジュールバンドラには[webpack](https://webpack.github.io/)を使っている。
 
 webpackは多機能だけど、あくまでJavaScriptのモジュールバンドラとして使っているので、
 必要に応じて[browserify](http://browserify.org/)に差し替えたりしている。
-実際、[Electron](http://electron.atom.io/)でアプリ作っていた時に、
-webpackでうまくやれなくてbrowserifyに変えたらさくっとできた、みたいなことがあった。
 
 
 インストール
@@ -281,8 +272,8 @@ Babelの設定は.babelrcに書く。
 ```
 
 開発環境用のwebpack設定を作る。
-エントリポイントのapp.jsを起点に必要なファイルを読み込んで、
-Babelを通してソースマップ付きでビルド済みディレクトリに配備する。
+
+エントリポイントのapp.jsを読み込んで、Babelを通してソースマップ付きでビルド済みディレクトリに配備している。
 
 webpack.config.js
 ```javascript
@@ -311,7 +302,7 @@ module.exports = {
 };
 ```
 
-gulpにbundle:devタスクを追加する。devタスクを修正する。
+JavaScript用のgulpタスクは次の通り。
 
 | タスク名 | 用途 |
 |:-|:-|
@@ -385,18 +376,15 @@ app/index.html
 
 ### プロダクション用のビルド
 
-開発用のビルド設定とは別にプロダクション用ビルド設定（ソースマップなし、ミニファイ化）も作っておく。
-ビルド済みリソースはzipで固めて、フロントエンドの開発を直接しない人に配れるようにしておく。
+開発用のビルド設定とは別にプロダクション用ビルド設定（ソースマップなし、ミニファイ化）も用意している。
+ビルド済みリソースはzipで固めて、直接フロントエンドの開発をしないメンバーに配れるようにする。
 
 インストール
 ```
 $ npm install --save-dev gulp-zip gulp-minify-css
 ```
 
-gulpにプロダクション用ビルドタスクを追加する。
-
-less:devとless:prodの共通部分をless関数として切り出して、それぞれのタスクに利用する。
-webpackのプロダクションビルド用設定を追加してbundle:prodではそちらを使うようにする。
+gulpのプロダクション用ビルドタスクは次の通り。
 
 | タスク名 | 用途 |
 |:-|:-|
@@ -405,6 +393,9 @@ webpackのプロダクションビルド用設定を追加してbundle:prodで�
 | bundle:prod | JavaScriptのプロダクション用ビルドを行う |
 | prod | プロダクションビルドを起動する |
 | build | プロダクションビルド（cleanしてprodする） |
+
+less:devとless:prodの共通部分をless関数として切り出して、それぞれのタスクに利用する。
+webpackのプロダクションビルド用設定を追加してbundle:prodではそちらを使うようにする。
 
 gulpfile.js
 ```javascript
@@ -505,7 +496,7 @@ config.plugins = [
 module.exports = config;
 ```
 
-buildディレクトリはgitignore対象にする。
+buildディレクトリはgitignore対象。
 
 .gitignore
 ```
@@ -526,15 +517,15 @@ package.json
 -- 中略 --
 ```
 
-プロダクション用ビルドはこんな感じでコマンドを叩いて行う。
+プロダクション用ビルドはコマンドを叩いて行う。
 ```
 $ npm run build
 ```
 
 ### テスト環境
 
-テストはmochaとpower-assertで書いている。
-テストコードもES6で書きたいのでewpower-babel使っている。
+テストは[mocha](https://mochajs.org/)と[power-assert](https://github.com/power-assert-js/power-assert)で書いている。
+テストコードもES6で書きたいのでespower-babelを使っている。
 
 インストール
 ```
@@ -586,7 +577,7 @@ package.json
 -- 中略 --
 ```
 
-テスト叩くときはこんな感じで一気に。vimで編集のファイルとか個別に叩くときはnpm run mochaで。
+テスト叩くときはこんな感じで一気に。Vimで編集のファイルとか個別に叩くときはnpm run mocha で。
 ```
 $ npm test
 ```
@@ -594,7 +585,7 @@ $ npm test
 ### APIサーバとつなぎながら開発
 
 AjaxでバックエンドのAPIを使う場合、可能であればバックエンドのサーバを起動しておいて、
-[http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)を使ってAPIへのリクエストだけリバースプロキシする。
+[http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)を使ってAPIへのリクエストだけリバースプロキシしている。
 
 
 インストール
@@ -602,7 +593,7 @@ AjaxでバックエンドのAPIを使う場合、可能であればバックエ�
 $ npm install --save-dev http-proxy-middleware
 ```
 
-gulpのserveタスクに修正を加える。
+この場合、gulpのserveタスクに次のような修正を加える。
 下の設定例だと/apiなパスへのリクエストはlocalhostの3000ポートの方へプロキシされる。
 
 gulefile.js
@@ -628,7 +619,7 @@ gulp.task('serve', () => {
 -- 中略 --
 ```
 
-fetchを使ってAPIを叩くサンプルで書くとこんな感じ。
+fetchを使ってAPIを叩くサンプルが次のような感じ。
 
 app/scripts/Hoge.js
 ```javascript
@@ -666,8 +657,7 @@ hoge.fetchGreet()
 });
 ```
 
-
-##### 補足：バックエンドサーバのAPIをモック
+**余談：バックエンドサーバのAPIをモック**
 
 バックエンドサーバのAPI仕様が[JSON Hyper-Schema](http://json-schema.org/)で定義されている場合
 （下のfixture/api.jsonみたいな感じ）、雑にモックサーバを起動して代替にしている。
@@ -727,7 +717,7 @@ fixture/api.json
 $ npm install --save-dev json-schema-mockserve
 ```
 
-gulpのserveタスクを修正する。
+この場合、gulpのserveタスクを次のように修正する。
 環境変数MOCKに値が設定された場合、モックサーバを起動するようにしている。
 
 gulpfile.js
@@ -775,14 +765,14 @@ package.json
 -- 中略 --
 ```
 
-こんな感じで起動する。
+コマンドから起動する。
 ```
 $ npm run gulp:mock
 ```
 
 ### fetchをモックしてテスト
 
-Promiseベースのインターフェイスになっていることから、
+Ajaxなことは、Promiseベースのインターフェイスになっていることから、
 XMLHttpRequestよりも[fetch](https://developer.mozilla.org/ja/docs/Web/API/Fetch_API)を使うようになった。
 fetchを使うAPIをテストする場合、[fetch-mock](https://github.com/wheresrhys/fetch-mock)を使っている。
 
@@ -838,7 +828,7 @@ describe('Hoge', () => {
 
 ### ブラウザでテスト
 
-Nodeの環境だけでなくブラウザ環境でもテストする場合は[testem](https://github.com/testem/testem)を使う。
+nodeの環境だけでなくブラウザ環境でもテストする場合は[testem](https://github.com/testem/testem)を使っている。
 
 webpackでJavaScriptコードをブラウザ用にビルドしてtestemに読ませてる。
 このとき、power-assertとwebpackでjsonの読み込みを可能にしておかないと、
