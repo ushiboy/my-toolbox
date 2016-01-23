@@ -44,11 +44,13 @@ $ npm install --save-dev gulp gulp-load-plugins del
 
 開発時に使う共通的なgulpのタスクは次の通り。
 
+
 | タスク名 | 用途 |
-|:-|:-|
+| -------- | ---- |
 | clean | ビルド済みディレクトリを削除する |
 | dev | 開発環境を起動する |
 | default | デフォルト（cleanしてdevを実行する）|
+
 
 gulpfile.js
 ```javascript
@@ -127,11 +129,13 @@ app/index.html
 
 HTMLと開発用Webサーバのためのgulpタスクは次の通り。
 
+
 | タスク名 | 用途 |
-|:-|:-|
+| -------- | ---- |
 | html | HTMLファイルをビルド済みディレクトリへ配備する |
 | serve | 開発用Webサーバを起動する |
 | dev | 開発環境を起動し、HTMLファイルを監視する |
+
 
 gulpfile.js
 ```javascript
@@ -203,13 +207,15 @@ app/index.html
 
 スタイル周りのgulpタスクは次の通り。
 
+
 | タスク名 | 用途 |
-|:-|:-|
+| -------- | ---- |
 | styles:dev | 開発環境用スタイルビルド（less:dev、fonts、imagesを実行する） |
 | less:dev | lessファイルをビルドする |
 | fonts | フォントリソースをビルド済みディレクトリへ配備する |
 | images | 画像リソースをビルド済みディレクトリへ配備する |
 | dev | 開発環境を起動し、HTMLファイル、lessファイルを監視する |
+
 
 gulpfile.js
 ```javascript
@@ -304,10 +310,12 @@ module.exports = {
 
 JavaScript用のgulpタスクは次の通り。
 
+
 | タスク名 | 用途 |
-|:-|:-|
+| -------- | ---- |
 | bundle:dev | JavaScriptの開発用ビルドを行う |
 | dev | 開発環境を起動し、HTMLファイル、lessファイル、JavaScriptファイルを監視する |
+
 
 gulpfile.js
 ```javascript
@@ -386,13 +394,15 @@ $ npm install --save-dev gulp-zip gulp-minify-css
 
 gulpのプロダクション用ビルドタスクは次の通り。
 
+
 | タスク名 | 用途 |
-|:-|:-|
+| -------- | ---- |
 | styles:prod | プロダクション環境用のstyleビルド（less:prod、fonts、imagesを実行する） |
 | less:prod | lessファイルのプロダクション用ビルドを行う |
 | bundle:prod | JavaScriptのプロダクション用ビルドを行う |
 | prod | プロダクションビルドを起動する |
 | build | プロダクションビルド（cleanしてprodする） |
+
 
 less:devとless:prodの共通部分をless関数として切り出して、それぞれのタスクに利用する。
 webpackのプロダクションビルド用設定を追加してbundle:prodではそちらを使うようにする。
