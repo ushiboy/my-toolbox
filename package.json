@@ -5,6 +5,7 @@
   "main": "index.js",
   "dist": "dist",
   "scripts": {
+    "start": "MOCK=ON gulp",
     "gulp": "gulp",
     "gulp:mock": "MOCK=ON gulp",
     "build": "gulp build",
